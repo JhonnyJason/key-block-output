@@ -9,12 +9,15 @@ blocked = {};
 
 //###########################################################
 export var setBlockingTimeMS = function(timeMS) {
-  return blockingTimeMS = timeMS;
+  if (typeof timeMS !== "number") {
+    throw new Error("TimeMS was no number!");
+  }
+  blockingTimeMS = timeMS;
 };
 
 //###########################################################
 export var blockOrThrow = function(key) {
-  var unblock;
+  var stop;
   if (typeof key !== "string") {
     throw new Error("Key was no string!");
   }
@@ -22,8 +25,29 @@ export var blockOrThrow = function(key) {
     throw new Error(`Key ${key} is blocked!`);
   }
   blocked[key] = true;
-  unblock = function() {
+  stop = function() {
     delete blocked[key];
   };
-  setTimeout(unblock, blockingTimeMS);
+  setTimeout(stop, blockingTimeMS);
+};
+
+//###########################################################
+export var isBlocked = function(key) {
+  if (typeof key !== "string") {
+    throw new Error("Key was no string!");
+  }
+  if (blocked[key]) {
+    return true;
+  }
+  return false;
+};
+
+//###########################################################
+export var passOrThrow = function(key) {
+  if (typeof key !== "string") {
+    throw new Error("Key was no string!");
+  }
+  if (blocked[key]) {
+    throw new Error(`Key ${key} is blocked!`);
+  }
 };
